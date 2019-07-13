@@ -1,8 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
+  <title>Blog4me</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+
+.upload-btn-wrapper:hover .btn-upload{
+  background-color: #bbb;
+}
+
+.upload-btn-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  float: right;
+}
+
+.btn-upload {
+  border: 1px solid black;
+  color: black;
+  background-color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 20px;
+  float: right;
+}
+
+.upload-btn-wrapper input[type=file] {
+  font-size: 100px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+
 body {
   font-family: "Lato", sans-serif;
 }
@@ -70,15 +101,26 @@ body {
 
 <div id="mySidebar" class="sidebar">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">X</a>
+  <a href="http://127.0.0.1:5000/main">Home</a>
   {% for cid, name in menu %}
-    <a href="#{{cid}}">{{name}}</a>
+  <a href="http://127.0.0.1:5000/main?title={{name}}&md_path={{page[cid]}}&cid={{cid}}">{{name}}</a>
   {% endfor %}
 </div>
 
 <div id="main">
   <button class="openbtn" onclick="openNav()">= Toggle Sidebar</button>
-  <h2>Collapsed Sidebar</h2>
-  <p>Click on the hamburger menu/bar icon to open the sidebar, and push this content to the right.</p>
+  <form name="upload" action="http://127.0.0.1:5000/upload?cid={{cid}}" method="POST" enctype="multipart/form-data">
+    <div class="upload-btn-wrapper">
+      <button class="btn-upload">Upload .md file</button>
+      <input type="file" name="md-file" onchange="changeValue(this)" />
+    </div>
+  </form>
+  <h2 id="title">{{title}}</h2>
+  <p id="view">
+    {% if md %}
+    {% include md %}
+    {% endif %}
+  </p>
 </div>
 
 <script>
@@ -91,6 +133,29 @@ function closeNav() {
   document.getElementById("mySidebar").style.width = "0";
   document.getElementById("main").style.marginLeft= "0";
 }
+
+function menuEvent(cid, name, md_file) {
+  console.log("in");
+  console.log(cid);
+  console.log(md_file);
+  document.getElementById("title").innerHTML = name;
+  document.getElementById("view").innerHTML = cid + ", " + md_file;
+}
+
+function changeValue(obj){
+  var file_path = String(obj.value)
+  console.log(file_path)
+  if (file_path.endsWith('.md')) {
+    var form = document.upload;
+    form.submit();
+    // alert(file_path);
+  } else if (file_path.length == 0) {
+    // 아무 일도 안함
+  } else {
+    alert("Markdown (.md) 파일을 선택해주세요.\n선택파일: " + file_path);
+  }
+}
+
 </script>
 
 </body>

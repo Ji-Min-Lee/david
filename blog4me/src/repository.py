@@ -45,6 +45,12 @@ class Repository:
     def delete_page(self, cid):
         self.conn.hdel(f"page:{cid}", "md_path")
 
+    def get_page(self, cid):
+        md_path = self.conn.hget(f"page:{cid}", "md_path")
+        if md_path is None:
+            return md_path
+        return md_path.decode("utf-8")
+
     def show_category(self, cid):
         name = self.conn.hget(f"category:{cid}", "name")
         parent_id = self.conn.hget(f"category:{cid}", "parent")
@@ -101,6 +107,8 @@ if __name__ == "__main__":
 
     cognito_id = repo.add_category("Cognito", aws_id)
     lambda_id = repo.add_category("Lambda", aws_id)
+
+    repo.add_page(devpi_id, "devpi")
 
     repo.show_category(python_id)
     repo.show_category(devpi_id)
